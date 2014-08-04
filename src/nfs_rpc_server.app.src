@@ -6,7 +6,7 @@
   {modules, []},
   {registered, []},
   {applications, [kernel, stdlib, ranch]},
-  {mod, {rpc_app, []}},
+  {mod, {nfs_rpc_app, []}},
   {env, [{args, [{nfs_rpc_app_arg,
                   uniq_ref, %% reference to be unique
                   128,      %% # of acceptor
