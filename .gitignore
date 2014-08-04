@@ -7,6 +7,6 @@ deps/
 src/pmap.hrl
 src/pmap_clnt.erl
 src/pmap_xdr.erl
-src/rpc.hrl
-src/rpc_clnt.erl
-src/rpc_xdr.erl
+src/nfs_rpc.hrl
+src/nfs_rpc_clnt.erl
+src/nfs_rpc_xdr.erl
