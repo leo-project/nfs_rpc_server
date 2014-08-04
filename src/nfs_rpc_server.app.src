@@ -1,0 +1,25 @@
+%% -*- mode: erlang;erlang-indent-level: 4;indent-tabs-mode: nil -*-
+{application, nfs_rpc_server,
+ [
+  {description, "Sun RPC(RFC1057) server"},
+  {vsn, "0.2.0"},
+  {modules, []},
+  {registered, []},
+  {applications, [kernel, stdlib, ranch]},
+  {mod, {rpc_app, []}},
+  {env, [{args, [{nfs_rpc_app_arg,
+                  uniq_ref, %% reference to be unique
+                  128,      %% # of acceptor
+                  [],       %% transport options
+                  10000,    %% rpc program number
+                  prg_name, %% rpc program name to be used for naming callback funcs
+                  [],       %% rpc program versions generated automatically
+                  1,        %% the lowest version of rpc program
+                  3,        %% the highest version of rpc program
+                  true,     %% whether using port map daemon or not
+                  module,   %% module to be used for implementing rpc callback funcs
+                  [],       %% init argments passed to module when starting this app
+                  []}       %% state to be used for storing arbitrary values
+                ]}]}
+ ]
+}.
