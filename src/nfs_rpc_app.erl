@@ -2,6 +2,7 @@
 -behaviour(application).
 
 -include("nfs_rpc_app.hrl").
+-include_lib("eunit/include/eunit.hrl").
 
 %% API
 -export([start/0]).
@@ -23,7 +24,7 @@ start() ->
 
 %% Callback  for application
 start(_Type, _Args) ->
-    {ok, Args}= application:get_env(rpc_server, args),
+    {ok, Args} = application:get_env(nfs_rpc_server, args),
     NewArgs = start_rpc_server(Args),
     {ok, Pid} = nfs_rpc_server_sup:start_link(),
     {ok, Pid, #state{args = NewArgs}}.

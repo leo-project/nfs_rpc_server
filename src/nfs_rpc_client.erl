@@ -315,7 +315,7 @@ handle_call({set_auth, Auth}, _From, State) ->
                  State#state{ auth = {None, None} };
              {auth_sys, Stamp, Name, Uid, Gid, Gids} ->
                  Cred = {'AUTH_SYS',
-                         rpc_xdr:enc_authsys_params({Stamp,Name,Uid,Gid,Gids})},
+                         nfs_rpc_xdr:enc_authsys_parms({Stamp,Name,Uid,Gid,Gids})},
                  State#state{auth = {Cred, None}}
          end,
     {reply, ok, call_const(S1)};
@@ -497,7 +497,7 @@ reply(Record, State) ->
 %%% May crash upon mismatch (caught).
 
 make_reply(Bin, _State) ->
-    case catch rpc_xdr:dec_rpc_msg(Bin, 0) of
+    case catch nfs_rpc_xdr:dec_rpc_msg(Bin, 0) of
         {{_Xid, {'REPLY', Body}}, ParOff} ->
             case Body of
                 {'MSG_ACCEPTED', {_Verf, Stat}} ->
@@ -695,12 +695,12 @@ keysearchdel([], _Key, _N, _Acc) ->
 call_const(S) ->
     {Cred, Verf} = S#state.auth,
     HeadBin = list_to_binary(
-                [rpc_xdr:enc_msg_type('CALL'),
+                [nfs_rpc_xdr:enc_msg_type('CALL'),
                  <<?RPC_VERSION_2:32/integer,
                    (S#state.program):32/integer,
                    (S#state.version):32/integer>>]),
-    AuthBin = list_to_binary([rpc_xdr:enc_opaque_auth(Cred),
-                              rpc_xdr:enc_opaque_auth(Verf)]),
+    AuthBin = list_to_binary([nfs_rpc_xdr:enc_opaque_auth(Cred),
+                              nfs_rpc_xdr:enc_opaque_auth(Verf)]),
     XidSz = 4,
     ProcSz = 4,
     Sz = XidSz + size(HeadBin) + ProcSz + size(AuthBin),
