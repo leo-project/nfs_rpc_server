@@ -9,7 +9,7 @@ all:
 	(cd src && erl -noshell -pa ../deps/erpcgen/ebin -eval 'erpcgen:file(pmap,    [xdrlib,clnt])' -s init stop)
 	(cd src && erl -noshell -pa ../deps/erpcgen/ebin -eval 'erpcgen:file(nfs_rpc, [xdrlib,clnt])' -s init stop)
 	@$(REBAR) compile
-	## @$(REBAR) xref skip_deps=true
+	@$(REBAR) xref skip_deps=true
 	@$(REBAR) eunit skip_deps=true
 compile:
 	@$(REBAR) compile skip_deps=true
