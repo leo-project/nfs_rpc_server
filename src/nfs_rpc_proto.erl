@@ -124,7 +124,7 @@ handle_msg(Msg, Sock, Addr, S) ->
             S;
         {rejected, Clnt, RejectBody, NState} ->
             Reply = {Clnt#client.xid, {'REPLY', {'MSG_DENIED', RejectBody}}},
-            send_reply(Clnt, rpc_xdr:enc_rpc_msg(Reply)),
+            send_reply(Clnt, nfs_rpc_xdr:enc_rpc_msg(Reply)),
             S#nfs_rpc_app_arg{state = NState};
         {noreply, NState} -> % the callback replies later
             S#nfs_rpc_app_arg{state = NState};
@@ -137,7 +137,7 @@ handle_msg(Msg, Sock, Addr, S) ->
 %% rpc messages and programming errors are handled the same way,
 %% both end up in the error log.
 handle_msg1(Msg, Sock, Addr, S) ->
-    {{Xid, Body}, Off} = rpc_xdr:dec_rpc_msg(Msg, 0),
+    {{Xid, Body}, Off} = nfs_rpc_xdr:dec_rpc_msg(Msg, 0),
     {'CALL', {RpcVsn, Prg, Vsn, Proc, Cred, Verf}} = Body,
     Clnt0 = #client{sock = Sock, addr = Addr, xid = Xid},
     chk_rpc_vsn(RpcVsn, Clnt0),
@@ -160,17 +160,17 @@ handle_msg1(Msg, Sock, Addr, S) ->
 
 do_reply(ErrorRep, Clnt) ->
     Reply = accepted(Clnt, ErrorRep),
-    send_reply(Clnt, rpc_xdr:enc_rpc_msg(Reply)).
+    send_reply(Clnt, nfs_rpc_xdr:enc_rpc_msg(Reply)).
 
 do_reply(success, Bytes, Clnt) ->
     Reply = accepted(Clnt, {'SUCCESS', <<>>}),
-    send_reply(Clnt, [rpc_xdr:enc_rpc_msg(Reply), Bytes]);
+    send_reply(Clnt, [nfs_rpc_xdr:enc_rpc_msg(Reply), Bytes]);
 do_reply(garbage_args, _, Clnt) ->
     Reply = accepted(Clnt, {'GARBAGE_ARGS', void}),
-    send_reply(Clnt, rpc_xdr:enc_rpc_msg(Reply));
+    send_reply(Clnt, nfs_rpc_xdr:enc_rpc_msg(Reply));
 do_reply(error, _, Clnt) ->
     Reply = accepted(Clnt, {'SYSTEM_ERR', void}),
-    send_reply(Clnt, rpc_xdr:enc_rpc_msg(Reply)).
+    send_reply(Clnt, nfs_rpc_xdr:enc_rpc_msg(Reply)).
 
 accepted(C, AcceptBody) ->
     {C#client.xid, {'REPLY', {'MSG_ACCEPTED', {C#client.rverf, AcceptBody}}}}.
@@ -211,7 +211,7 @@ send_reply(#client{sock = S, addr = {Ip, Port}}, Reply) ->
     gen_udp:send(S, Ip, Port, Reply).
 
 log_error(Fun, S, Term) ->
-    Cause = io_lib:format("rpc_server: prog:~p vsns:~p ~p\n",
+    Cause = io_lib:format("nfs_rpc_server: prog:~p vsns:~p ~p\n",
                           [S#nfs_rpc_app_arg.prg_num,
                            S#nfs_rpc_app_arg.prg_vsns,
                            Term]),
