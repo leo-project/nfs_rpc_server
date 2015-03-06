@@ -2,7 +2,7 @@
 {application, nfs_rpc_server,
  [
   {description, "Sun RPC(RFC1057) server"},
-  {vsn, "0.2.1"},
+  {vsn, "0.2.3"},
   {modules, []},
   {registered, []},
   {applications, [kernel, stdlib, ranch]},
