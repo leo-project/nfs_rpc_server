@@ -202,7 +202,7 @@ controlling_process(Clnt, NewOwner) when is_pid(NewOwner) ->
 %%----------------------------------------------------------------------
 
 init([Host, Program, Version, Proto, Port]) ->
-    Stats = #statistics{ start_time = now() },
+    Stats = #statistics{ start_time = os:timestamp() },
     None = {'AUTH_NONE', <<>>},
     S0 = #state{ port = Port, program = Program, version = Version,
                  proto = Proto, statistics = Stats,
@@ -324,9 +324,9 @@ handle_call(get_auth, _From, State) ->
 handle_call(get_queue_length, _From, State) ->
     {reply, State#state.pendinglen, State};
 handle_call(get_stats, _From, State) ->
-    {reply, {ok, prettyify_stats(State, now())}, State};
+    {reply, {ok, prettyify_stats(State, os:timestamp())}, State};
 handle_call(get_and_reset_stats, _From, State) ->
-    Now = now(),
+    Now = os:timestamp(),
     {reply, compute_stats(State, Now),
      State#state{ statistics = #statistics{ start_time = Now } }};
 handle_call({set_owner, NewOwner}, From, State) ->
@@ -457,7 +457,7 @@ make_call2(From, Size, Call, Timeout, S, Procedure, Timers0) ->
         0 ->
             {reply, {error, timeout}, S#state{xid = S#state.xid+1}};
         _ ->
-            Pnew = #pending{from = From, start_time = now(),
+            Pnew = #pending{from = From, start_time = os:timestamp(),
                             timers = Timers1,
                             bytes_out = Size,
                             xid = S#state.xid, packet = Call},
@@ -533,7 +533,7 @@ make_reply(Bin, _State) ->
 
 %%% Update the statistics based on a successful RPC.
 update_stats(S, P) when is_record(S, statistics), is_record(P, pending) ->
-    Dt = now_diff(now(), P#pending.start_time),
+    Dt = now_diff(os:timestamp(), P#pending.start_time),
     Dt2 = Dt * Dt,
     S#statistics{
       replies = S#statistics.replies + 1,
@@ -576,7 +576,7 @@ prettyify_stats(State, _Now) ->
                    {rpc_program, State#state.program},
                    {rpc_version, State#state.version}
                   ],
-                  compute_stats(State, now()),
+                  compute_stats(State, os:timestamp()),
                   [{per_op_counts, Stats#statistics.proccounts},
                    {calls, Stats#statistics.calls},
                    {replies, Stats#statistics.replies},
